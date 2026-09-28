@@ -32,16 +32,14 @@ def executar_consulta(query_onde="", params=None):
     cursor.execute(query_final, params)
 
     colunas = ["Lote ID", "Produto", "Produto ID", "Quantidade", "Preço", "Validade"]
-    dados_exportar = []
+    dados = []
 
     resultados = cursor.fetchall()
     for lin in resultados:
         lot_id, product_name, product_id, quant, price, date_valid = lin
-        data_obj = datetime.strptime(date_valid, "%Y-%m-%d").date()
-        beat_dt = data_obj.strftime("%d/%m/%Y")
+        data_obj = datetime.strptime(date_valid, "%Y-%m-%d").strftime("%d/%m/%Y")
         
-        print(f"Lote: {lot_id:<6} | {product_name:<50} |Id: {product_id:<6} | Qtd: {quant:<5} | Validade: {beat_dt:<10}")
-        dados_exportar.append([lot_id, product_name, product_id, quant, price, beat_dt])
+        dados.append([lot_id, product_name, product_id, quant, price, data_obj])
 
     # Envia os dados para o orquestrador
-    return colunas, dados_exportar
+    return colunas, dados

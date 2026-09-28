@@ -1,5 +1,7 @@
 from database import conn, cursor, init_db
-from controller import call_menu
+from controller import call_menu, selector, advanced_menu
+from crud.delete import delete
+from crud.create import add_product
 
 
 def menu():
@@ -26,11 +28,19 @@ def main():
         if opcao == 1:
             call_menu()
         elif opcao == 2:
-            ...
+            add_product()
         elif opcao == 3:
             ...
         elif opcao == 4:
-            ...
+          _, data = advanced_menu()
+          if data:  
+             entity = selector(data)
+             if entity:  
+                delete(entity)
+             else:
+               print("\nNenhum registro encontrado para exclusão.")
+
+
         elif opcao == 0:
             print("Encerrando o programa...")
             cursor.close()
