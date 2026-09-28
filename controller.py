@@ -125,7 +125,7 @@ def selector(data: list):
     
     for i, row in enumerate(data, start=1):
          lot_id, nome, prod_id, quant, price, validade = row
-         print(f"[{i}] Lote #{lot_id} | {nome:<50} | Qtd: {quant:<5} | Preço: R$ {price:<7} | {validade:<10} ")
+         print(f"[{i:<5}] Lote #{lot_id:<6} | {nome:<50} | Qtd: {quant:<5} | Preço: R$ {price:<7} | {validade:<10} ")
     print("[0] Cancelar operação")
     print("=" * 60)
 
