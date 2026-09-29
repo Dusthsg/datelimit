@@ -37,7 +37,7 @@ def main():
                 if entity:  
                   update_product(entity)
                 else:
-                  print("\nNenhum registro encontrado para exclusão.")
+                  print("\nNenhum registro encontrado para Atualização.")
         elif opcao == 4:
           _, data = advanced_menu()
           if data:  

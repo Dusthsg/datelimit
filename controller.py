@@ -18,17 +18,22 @@ def orquest(colunas: list, dados: list) -> None:
         print(f"{lot_id:<6} | {nome:<50} | {prod_id:<8} | {quant:<6} | R${price:<6.2f} | {validade:<10}")
     print("=" * 105)
 
-    opcao = input("\nDeseja exportar esses dados para Excel? (s/n): ").strip().lower()
+
+    while True:
+      opcao = input("\nDeseja exportar esses dados para Excel? (s/n): ").strip().lower()
+
+      if opcao not in ["s", "n"]:
+          break
     
-    if opcao == "s":
+      if opcao == "s":
         nome = input("Nome do arquivo (Enter para 'lotes.xlsx'): ").strip() or "lotes.xlsx"
         if not nome.endswith(".xlsx"):
             nome += ".xlsx"
             
         make_ex(colunas, dados, nome)
-    else:
+      else:
         print("Finalizado sem exportação.")
-
+       
 
 def query_venc():
     q_date = " AND l.date_valid < ?"
@@ -57,23 +62,35 @@ def adv_query(req_list):
 
     if 1 in req_list:
         text = input("Insira o nome ou parte dele para buscar: ").strip()
+
+        if not text:
+             print("ERRO 301, entrada não inserida")
+             return None
+        
         query += " AND p.name LIKE ?"
         params.append(f"%{text}%")
 
     if 2 in req_list:
         input_date = input("Insira uma data específica como (20/10/2028 ou 20-10-2028): ").strip()
+        if not input_date:
+            print("ERRO 301, entrada não inserida")
+            return None
+        
         try:
             datef = datetime.strptime(input_date.replace("/", "-"), "%d-%m-%Y").strftime("%Y-%m-%d")
             query += " AND l.date_valid = ?"
             params.append(datef)
         except ValueError:
             print("Data inválida. Certifique-se de digitar no formato DD/MM/AAAA.")
-            return [], []
+            return None
 
     if 3 in req_list:
-        text = input("Insira um período em dias ex: (30, 45) ou apenas (30): ").strip()
-        arr = [int(x.strip()) for x in text.split(",") if x.strip().isdigit()]
+        datei = input("Insira um período em dias ex: (30, 45) ou apenas (30): ").strip()
+        arr = [int(x.strip()) for x in datei.split(",") if x.strip().isdigit()]
         today = datetime.now().date()
+        if not datei:
+                    print("ERRO 301, entrada não inserida")
+                    return None
 
         if len(arr) == 2:
             days_min, days_max = sorted(arr)
@@ -93,11 +110,14 @@ def adv_query(req_list):
             params.append(end.strftime("%Y-%m-%d"))
         else:
             print("Entrada inválida! Digite 1 ou 2 números separados por vírgula.")
-            return [], []
+            return None
 
     if 4 in req_list:
         entrada_qtd = input("Insira a quantidade (ex: 10 para teto, ou 0, 10 para intervalo): ").strip()
         arr_qtd = [int(x.strip()) for x in entrada_qtd.split(",") if x.strip().isdigit()]
+        if not entrada_qtd:
+                    print("ERRO 301, entrada não inserida")
+                    return None
 
         if len(arr_qtd) == 1:
             query += " AND l.quant <= ?"
@@ -109,7 +129,7 @@ def adv_query(req_list):
             params.append(qtd_max)
         else:
             print("Entrada de quantidade inválida! Digite 1 ou 2 números.")
-            return [], []
+            return None
 
     colunas, dados = executar_consulta(query, params)
     return colunas, dados
@@ -166,9 +186,26 @@ def advanced_menu():
         try:
             input_query = input("Insira o(s) número(s) referente às opções separadas por vírgula ( , ): ")
             args = [int(x.strip()) for x in input_query.split(",") if x.strip().isdigit()]
-            if 0 in args or not args:
-                return [], []
-            return adv_query(args)
+
+            if not args:
+                print("Nenhuma opção informada")
+
+            if (0 in args and len(args) == 1):
+                return None
+            
+            if 0 in args:
+                print("Entrada Inválida! [0] é valor de sáida")
+                continue
+
+            if any(x not in (1, 2, 3, 4) for x in args):
+                 print("Entrada inválida! Escolha apenas opções entre 1 e 4.")
+                 continue
+            
+            result = adv_query(args)
+            if result is None:
+                continue
+            return result
+        
         except ValueError:
             print("Entrada inválida! Digite apenas números inteiros.")
 
@@ -189,7 +226,11 @@ def main_menu():
 
     while True:
         try:
-            return int(input("Insira a opção que deseja: "))
+            choose = int(input("Insira a opção que deseja: "))
+            if not 0 <= choose <= 7:
+               print("Opção inválida! Escolha uma opçao entre 0 e 7")
+               return choose
+            return choose
         except ValueError:
             print("Entrada inválida! Digite apenas números inteiros.")
 

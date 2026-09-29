@@ -11,7 +11,13 @@ def add_product():
 
     try:
         quant = int(input("Quantidade: "))
+        if quant < 0:
+            print("Quantidade inválida, a quantidade não pode ser negativa")
+            return
         price = float(input("Preço unitário: ").replace(",", "."))
+        if quant < 0:
+            print("Preço inválido, Preço deve ser maior que 0")
+            return
     except ValueError:
         print("-> Erro: Quantidade deve ser um número inteiro e Preço deve ser numérico.")
         return
