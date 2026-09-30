@@ -41,5 +41,4 @@ def executar_consulta(query_onde="", params=None):
         
         dados.append([lot_id, product_name, product_id, quant, price, data_obj])
 
-    # Envia os dados para o orquestrador
     return colunas, dados

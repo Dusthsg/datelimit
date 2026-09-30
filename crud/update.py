@@ -1,6 +1,12 @@
 from datetime import datetime
 from database import conn, cursor
 
+from repositories.lot_repository import LotRepository
+from repositories.product_repository import ProductRepository
+
+product_repo = ProductRepository()
+lot_repo = LotRepository()
+
 
 def update_product(entity):
     lot_id, nome, prod_id, quant, price, validade = entity
@@ -39,7 +45,7 @@ def processing_update(args, entity):
     if 1 in args:
         new_name = input(f"Digite um novo nome para [{nome}]: ")
         if new_name:
-            cursor.execute("UPDATE products SET name = ? WHERE id = ?", (new_name, prod_id))
+            product_repo.update_name(prod_id, new_name)
             print("-> Nome atualizado com sucesso!")
 
     set_clauses = []
@@ -48,37 +54,23 @@ def processing_update(args, entity):
     if 2 in args:
         try:
            new_quant = int(input(f"Digite uma nova quantidade para [{quant}]: "))
-           set_clauses.append("quant = ?")
-           params.append(new_quant)
-
         except ValueError:
          print("Quantidade inválida! Campo ignorado.")
 
     if 3 in args:
         try:
            new_price = float(input(f"Digite um novo preço para [{price:.2f}]: "))
-           set_clauses.append("price = ?")
-           params.append(new_price)
-
         except ValueError:
             print("Preço inválido! Campo ignorado.")
 
     if 4 in args:
         try:
-           new_date = input("Digite a nova data em formato (22/12/2028 ou 22-12/2028): ")
-           datef = datetime.strptime(new_date.replace("/", "-"), "%d-%m-%Y").strftime("%Y-%m-%d")
-
-           set_clauses.append("date_valid = ?")
-           params.append(datef)
-
+           raw_date = input("Digite a nova data em formato (22/12/2028 ou 22-12/2028): ")
+           new_date = datetime.strptime(raw_date.replace("/", "-"), "%d-%m-%Y").strftime("%Y-%m-%d")
         except ValueError:
             print("Data inválida! Campo ignorado.")
 
-    if set_clauses:
-        sql = f"UPDATE product_lots SET {', '.join(set_clauses)} WHERE id = ?"
-        params.append(lot_id)
-        cursor.execute(sql, tuple(params))
-
-    conn.commit()
-    print("\n[OK] Todas as alterações foram salvas!")
+    if any(param is not None for param in (new_quant, new_price, new_date)):
+      lot_repo.update(lot_id, quant=new_quant, price=new_price, date_valid=new_date)
+      print("\n[OK] Alterações do lote salvas!")
    

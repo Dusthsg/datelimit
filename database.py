@@ -5,7 +5,6 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent / "database"
 BASE_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = BASE_DIR / "products.db"
-DB_PATH
 
 
 

@@ -33,6 +33,7 @@ def orquest(colunas: list, dados: list) -> None:
         make_ex(colunas, dados, nome)
       else:
         print("Finalizado sem exportação.")
+        return
        
 
 def query_venc():

@@ -1,4 +1,9 @@
 from database import conn, cursor
+from repositories.product_repository import ProductRepository
+from repositories.lot_repository import LotRepository
+
+product_repo = ProductRepository()
+lot_repo = LotRepository()
 
 class NewLotItem:
     def __init__(self, name: str, quant: int, price: float, date_valid: str):
@@ -12,23 +17,14 @@ class NewLotItem:
         Salva o produto (se não existir) e registra o novo lote.
         Retorna: (product_id, lot_id)
         """
-        cursor.execute("SELECT id FROM products WHERE name = ?", (self.name,))
-        row = cursor.fetchone()
+    
+        row = product_repo.get_by_name(self.name)
 
         if row:
             product_id = row[0]
         else:
-            # Correção: VALUES (?) com parênteses
-            cursor.execute("INSERT INTO products (name) VALUES (?)", (self.name,))
-            product_id = cursor.lastrowid
+            product_id = product_repo.create(self.name)
 
-        # Correção: nome da tabela 'product_lots'
-        cursor.execute("""
-            INSERT INTO product_lots (product_id, quant, price, date_valid) 
-            VALUES (?, ?, ?, ?)
-        """, (product_id, self.quant, self.price, self.date_valid))
-
-        conn.commit()
-        lot_id = cursor.lastrowid
+        lot_id = lot_repo.create()
 
         return product_id, lot_id
