@@ -134,8 +134,24 @@ Consulte [CONTRIBUTING.md](CONTRIBUTING.md) para orientações sobre desenvolvim
 
 ## Segurança
 
-Consulte [SECURITY.md](SECURITY.md) para reportar vulnerabilidades.
+Orientações específicas de segurança serão documentadas separadamente. Até lá, vulnerabilidades devem ser reportadas de forma responsável através das ferramentas de comunicação disponíveis no repositório.
 
 ## Licença
 
-Este projeto ainda não possui uma licença open source definida. Não assuma permissão para redistribuição ou uso comercial até que uma licença seja adicionada.
+O DateLimit é **source-available** e está licenciado sob a **PolyForm Noncommercial License 1.0.0**.
+
+A licença permite, entre outras coisas:
+
+- uso pessoal e para estudo;
+- pesquisa, experimentação e testes sem finalidade comercial;
+- modificação do código;
+- criação de trabalhos derivados;
+- redistribuição, desde que os termos da licença sejam mantidos.
+
+**Uso comercial não é permitido pela licença padrão.** Isso inclui usos destinados à obtenção de vantagem comercial ou compensação monetária. Qualquer utilização comercial exige uma autorização/licença adicional do detentor dos direitos autorais.
+
+O DateLimit **não é um projeto open source no sentido da definição da OSI**. O código-fonte é disponibilizado publicamente para inspeção, estudo, modificação e usos permitidos pela licença, mas existem restrições quanto ao uso comercial.
+
+Consulte o arquivo [LICENSE](LICENSE) para os termos completos.
+
+A licença utilizada é a [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0).
