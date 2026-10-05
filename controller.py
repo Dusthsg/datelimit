@@ -1,23 +1,18 @@
 from datetime import datetime, date, timedelta
 from archive_mp.export import make_ex 
-from crud.read import executar_consulta
+from repositories.lot_repository import LotRepository
+from repositories.product_repository import ProductRepository
+from views.screens import show_data
+
+prod_repo = ProductRepository()
+lot_repo = LotRepository()
 
 def orquest(colunas: list, dados: list) -> None:
     """Recebe os dados que já foram consultados e decide a exportação."""
     if not dados:
         print("\nNenhum registro encontrado para exportar.")
         return
-
-    # 1. EXIBIÇÃO NO TERMINAL
-    print("\n" + "=" * 105)
-    print(f"{'Lote':<6} | {'Produto':<50} | {'Prod ID':<8} | {'Qtd':<6} | {'Preço':<8} | {'Validade':<10}")
-    print("-" * 100)
-    
-    for lin in dados:
-        lot_id, nome, prod_id, quant, price, validade = lin
-        print(f"{lot_id:<6} | {nome:<50} | {prod_id:<8} | {quant:<6} | R${price:<6.2f} | {validade:<10}")
-    print("=" * 105)
-
+    show_data(dados)
 
     while True:
       opcao = input("\nDeseja exportar esses dados para Excel? (s/n): ").strip().lower()
@@ -33,12 +28,14 @@ def orquest(colunas: list, dados: list) -> None:
         make_ex(colunas, dados, nome)
       else:
         print("Finalizado sem exportação.")
+        return
        
 
 def query_venc():
     q_date = " AND l.date_valid < ?"
     today = date.today().strftime("%Y-%m-%d")
-    colunas, dados = executar_consulta(q_date, [today])
+    colunas = lot_repo.get_columns()
+    dados = lot_repo.read(q_date, [today])
     orquest(colunas, dados)
 
 
@@ -47,14 +44,11 @@ def query_days(days_min, days_max):
     init = (today + timedelta(days=days_min)).strftime("%Y-%m-%d")
     end = (today + timedelta(days=days_max)).strftime("%Y-%m-%d")
 
-    q_date = " AND l.date_valid BETWEEN ? AND ?"
-    colunas, dados = executar_consulta(q_date, [init, end])
+    query_search = " AND l.date_valid BETWEEN ? AND ?"
+    colunas = lot_repo.get_columns()
+    dados = lot_repo.read(query_search, [init, end])
     orquest(colunas, dados)
 
-
-"""==================== MENU DE BUSCA AVANÇADA ====================
-Opções de Busca: Nome, data especifica, período e quantidade 
-"""
 
 def adv_query(req_list):
     query = ""
@@ -130,8 +124,8 @@ def adv_query(req_list):
         else:
             print("Entrada de quantidade inválida! Digite 1 ou 2 números.")
             return None
-
-    colunas, dados = executar_consulta(query, params)
+    colunas = lot_repo.get_columns()
+    dados = lot_repo.read(query, params)
     return colunas, dados
 
 """===================================================================================================================="""
@@ -167,94 +161,47 @@ def selector(data: list):
                 
         except ValueError:
             print("Entrada inválida! Digite apenas números inteiros.")
-"""===================================================================================================================="""
-"""Delete"""
-"""===================================================================================================================="""
 
 
-def advanced_menu():
-    print("\n" + "=" * 55)
-    print(f"{'DATELIMIT Menu de Busca Avançada':^50}")
-    print("=" * 55)
-    print("[1] Nome")
-    print("[2] Data Específica")
-    print("[3] Período")
-    print("[4] Quantidade")
-    print("[0] Sair")
-    print("=" * 55)
-    while True:
+def processing_update(args, entity):
+    lot_id, nome, prod_id, quant, price, validade = entity
+
+    # 1. Se escolheu alterar o Nome (Tabela 'products')
+    if 1 in args:
+        new_name = input(f"Digite um novo nome para [{nome}]: ").strip()
+        if new_name:
+            prod_repo.update(prod_id, {"name": new_name})
+            print("-> Nome atualizado com sucesso!")
+
+    # 2. Dicionário de campos dinâmicos para a tabela 'product_lots'
+    lot_fields = {}
+
+    if 2 in args:
         try:
-            input_query = input("Insira o(s) número(s) referente às opções separadas por vírgula ( , ): ")
-            args = [int(x.strip()) for x in input_query.split(",") if x.strip().isdigit()]
-
-            if not args:
-                print("Nenhuma opção informada")
-
-            if (0 in args and len(args) == 1):
-                return None
-            
-            if 0 in args:
-                print("Entrada Inválida! [0] é valor de sáida")
-                continue
-
-            if any(x not in (1, 2, 3, 4) for x in args):
-                 print("Entrada inválida! Escolha apenas opções entre 1 e 4.")
-                 continue
-            
-            result = adv_query(args)
-            if result is None:
-                continue
-            return result
-        
+            new_quant = int(input(f"Digite uma nova quantidade para [{quant}]: "))
+            lot_fields["quant"] = new_quant
         except ValueError:
-            print("Entrada inválida! Digite apenas números inteiros.")
+            print("Quantidade inválida! Campo ignorado.")
 
-
-def main_menu():
-    print("\n" + "=" * 55)
-    print(f"{'DATELIMIT Menu Principal':^50}")
-    print("=" * 55)
-    print("[1] Vencidos")
-    print("[2] Crítico (7 dias)")
-    print("[3] Atenção (8 - 29 dias)")
-    print("[4] Alerta (30 - 45 dias)")
-    print("[5] Completa (0 - 45 dias)")
-    print("[6] Todos os registros")
-    print("[7] Busca avançada")
-    print("[0] Sair")
-    print("=" * 55)
-
-    while True:
+    if 3 in args:
         try:
-            choose = int(input("Insira a opção que deseja: "))
-            if not 0 <= choose <= 7:
-               print("Opção inválida! Escolha uma opçao entre 0 e 7")
-               return choose
-            return choose
+            raw_price = input(f"Digite um novo preço para [{price:.2f}]: ").replace(",", ".")
+            lot_fields["price"] = float(raw_price)
         except ValueError:
-            print("Entrada inválida! Digite apenas números inteiros.")
+            print("Preço inválido! Campo ignorado.")
 
+    if 4 in args:
+        try:
+            new_date = input("Digite a nova data em formato (22/12/2028 ou 22-12-2028): ").strip()
+            datef = datetime.strptime(new_date.replace("/", "-"), "%d-%m-%Y").strftime("%Y-%m-%d")
+            lot_fields["date_valid"] = datef
+        except ValueError:
+            print("Data inválida! Campo ignorado.")
 
-def call_menu():
-    while True:
-        num = main_menu()
-
-        if num == 1:
-            query_venc()
-        elif num == 2:
-            query_days(0, 7)
-        elif num == 3:
-            query_days(8, 29)
-        elif num == 4:
-            query_days(30, 45)
-        elif num == 5:
-            query_days(0, 45)
-        elif num == 6:
-            colunas, dados = executar_consulta()
-            orquest(colunas, dados)
-        elif num == 7:
-            column, data = advanced_menu()
-            orquest(column, data)
-        elif num == 0:
-            print("Saindo...")
-            break
+    # 3. Executa o update dinâmico via repositório
+    if lot_fields:
+        sucesso = lot_repo.update(lot_id, lot_fields)
+        if sucesso:
+            print(f"\n[OK] Lote #{lot_id} atualizado com sucesso!")
+        else:
+            print("\n[!] Falha ao atualizar o lote.")
