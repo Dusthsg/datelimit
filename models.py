@@ -25,6 +25,11 @@ class NewLotItem:
         else:
             product_id = product_repo.create(self.name)
 
-        lot_id = lot_repo.create()
+        lot_id = lot_repo.create(
+            product_id=product_id,
+            quant=self.quant,
+            price=self.price,
+            date_valid=self.date_valid
+        )
 
         return product_id, lot_id

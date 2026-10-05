@@ -16,33 +16,32 @@ class LotRepository:
         return lot_id
 
     def delete(self, lot_id: int):
-        self.cursor.execute("DELETE FROM product_lots WHERE id = ?", (lot_id,))
+        if isinstance(lot_id, (list, tuple)):
+            lot_id = lot_id[0]
+        self.cursor.execute("DELETE FROM product_lots WHERE id = ?", [lot_id])
         self.conn.commit()
+        print("produto deletado com sucesso")
 
-    def update(self, lot_id: int, quant: int = None, price: float = None, date_valid: str = None):
-        fields = []
-        params = []
+    def update(self, lot_id, fields: dict) -> bool:
+     if not fields:
+        return False
 
-        if quant is not None:
-            fields.append("quant = ?")
-            params.append(quant)
+     # Desempacota caso lot_id venha como tupla (ex: row de fetchone)
+     if isinstance(lot_id, (tuple, list)):
+        lot_id = lot_id[0]
 
-        if price is not None:
-            fields.append("price = ?")
-            params.append(price)
+    # 1. Gera: 'price = ?', 'quant = ?'
+     set_clause = ", ".join([f"{col} = ?" for col in fields.keys()])
+     sql = f"UPDATE product_lots SET {set_clause} WHERE id = ?"
 
-        if date_valid is not None:
-            fields.append("date_valid = ?")
-            params.append(date_valid)
+     # 2. Extrai APENAS os valores do dict e coloca o lot_id no final
+     params = list(fields.values()) + [lot_id]
 
-        if not fields:
-            return
+    # 3. Executa passando os valores primitivos
+     self.cursor.execute(sql, tuple(params))
+     self.conn.commit()
 
-        params.append(lot_id)   
-        sql = f"UPDATE product_lots SET {', '.join(fields)} WHERE id = ?"
-        
-        self.cursor.execute(sql, tuple(params))
-        self.conn.commit()
+     return self.cursor.rowcount > 0
 
     def read(self, query_search="", params=None):
         if params is None:
@@ -63,3 +62,9 @@ class LotRepository:
         query_final = query_base + query_search + " ORDER BY l.date_valid ASC, p.name ASC;"
         self.cursor.execute(query_final, params)
         return self.cursor.fetchall()
+
+    def get_columns(self):
+        """Retorna os nomes das colunas da última consulta executada."""
+        if self.cursor.description:
+            return [desc[0] for desc in self.cursor.description]
+        return []

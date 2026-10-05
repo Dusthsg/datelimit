@@ -1,12 +1,15 @@
 from database import conn, cursor, init_db
-from controller import call_menu, selector, advanced_menu
-from crud.delete import delete
-from crud.create import add_product
-from crud.update import update_product
+from controller import selector, processing_update
+
+from views.menus import call_menu, advanced_menu
+from views.screens import add_product, update_product
+from repositories.lot_repository import LotRepository
+from models import NewLotItem
+repo = LotRepository()
 
 
 def menu():
-    print("\n-------- Devstore --------")
+    print("\n-------- DateLimit --------")
     print("Opção 0 : Sair")
     print("Opção 1 : Listar Produtos")
     print("Opção 2 : Inserir Produto")
@@ -21,7 +24,7 @@ def menu():
 
 
 def main():
-    init_db()  # Garante que a tabela existe ao iniciar
+    init_db()
 
     while True:
         opcao = menu()
@@ -29,13 +32,21 @@ def main():
         if opcao == 1:
             call_menu()
         elif opcao == 2:
-            add_product()
+           data = add_product()
+           if data:
+              product = NewLotItem(**data)
+              prod_id, lot_id = product.save()
+              print(f"Produto salvo com sucesso com ID: {prod_id} e Lote: {lot_id}")
+           else:
+              print("Operação cancelada")
+                
         elif opcao == 3:
              _, data = advanced_menu()
              if data:  
                 entity = selector(data)
-                if entity:  
-                  update_product(entity)
+                if entity: 
+                 args, entity = update_product(entity)
+                 processing_update(args, entity)
                 else:
                   print("\nNenhum registro encontrado para Atualização.")
         elif opcao == 4:
@@ -43,7 +54,7 @@ def main():
           if data:  
              entity = selector(data)
              if entity:  
-                delete(entity)
+                repo.delete(entity)
              else:
                print("\nNenhum registro encontrado para exclusão.")
 
