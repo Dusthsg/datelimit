@@ -138,7 +138,7 @@ def selector(data: list):
         return None
     
     for i, row in enumerate(data, start=1):
-         lot_id, nome, prod_id, quant, price, validade = row
+         lot_id, nome, prod_id, quant, price, validade = row[:6]
          print(f"[{i:<5}] Lote #{lot_id:<6} | {nome:<50} | Qtd: {quant:<5} | Preço: R$ {price:<7} | {validade:<10} ")
     print("[0] Cancelar operação")
     print("=" * 60)
@@ -164,7 +164,7 @@ def selector(data: list):
 
 
 def processing_update(args, entity):
-    lot_id, nome, prod_id, quant, price, validade = entity
+    lot_id, nome, prod_id, quant, price, validade = entity[:6]
 
     # 1. Se escolheu alterar o Nome (Tabela 'products')
     if 1 in args:
@@ -195,6 +195,20 @@ def processing_update(args, entity):
             new_date = input("Digite a nova data em formato (22/12/2028 ou 22-12-2028): ").strip()
             datef = datetime.strptime(new_date.replace("/", "-"), "%d-%m-%Y").strftime("%Y-%m-%d")
             lot_fields["date_valid"] = datef
+        except ValueError:
+            print("Data inválida! Campo ignorado.")
+
+    if 5 in args:
+        try:
+            new_local = input("Digite a novo local para o produto: ").strip().upper()
+            lot_fields["location"] = new_local
+        except ValueError:
+            print("Data inválida! Campo ignorado.")
+
+    if 6 in args:
+        try:
+            new_status = input("Digite o novo status exemplo (vencido): ").strip().upper()
+            lot_fields["status"] = new_status
         except ValueError:
             print("Data inválida! Campo ignorado.")
 

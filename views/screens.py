@@ -6,12 +6,12 @@ def show_data(data):
     print(f"{'Lote':<6} | {'Produto':<50} | {'Prod ID':<8} | {'Qtd':<6} | {'Preço':<8} | {'Validade':<10}")
     print("-" * 100)
     for lin in data:
-            lot_id, nome, prod_id, quant, price, validade = lin
+            lot_id, nome, prod_id, quant, price, validade = lin[:6]
             print(f"{lot_id:<6} | {nome:<50} | {prod_id:<8} | {quant:<6} | R${price:<6.2f} | {validade:<10}")
     print("=" * 105)
 
 def delete(entity):
-     lot_id, nome, prod_id, quant, price, validade = entity
+     lot_id, nome, prod_id, quant, price, validade = entity[:6]
      print(f"\nEntidade Selecionada: Lote #{lot_id} | {nome:<30} | Qtd: {quant:<5} | Preço: R$ {price:<7} | Validade: {validade}")
      print("[1] Deletar apenas este lote")
      print("[2] Deletar o produto e todos os seus lotes")
@@ -93,7 +93,7 @@ def add_product():
     }
 
 def update_product(entity):
-    lot_id, nome, prod_id, quant, price, validade = entity
+    lot_id, nome, prod_id, quant, price, validade = entity[:6]
     print(f"\nEntidade Selecionada: Lote #{lot_id:<7} | {nome:<50} | Qtd: {quant:<4} | Preço: R$ {price:<7} | Val: {validade}")
 
     print("\n" + "=" * 55)
@@ -103,6 +103,8 @@ def update_product(entity):
     print("[2] Quantidade")
     print("[3] Preço")
     print("[4] Data de Validade")
+    print("[5] Localidade")
+    print("[6] Status")
     print("[0] Sair / Cancelar")
     print("=" * 55)
 

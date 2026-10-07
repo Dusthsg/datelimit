@@ -18,7 +18,8 @@ def init_db():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL
+        name TEXT UNIQUE NOT NULL,
+        bar_code TEXT UNIQUE
     );
     """)
 
@@ -29,6 +30,8 @@ def init_db():
         quant INTEGER DEFAULT 0,
         price REAL DEFAULT 0.0,
         date_valid TEXT NOT NULL,
+        location TEXT DEFAULT 'LOJA',
+        status TEXT DEFAULT 'NORMAL',
         FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
     );
     """)

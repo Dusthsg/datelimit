@@ -54,7 +54,9 @@ class LotRepository:
         p.id AS product_id,
         l.quant,
         l.price,
-        l.date_valid
+        l.date_valid,
+        l.location,
+        l.status
     FROM product_lots l
     INNER JOIN products p ON p.id = l.product_id
     WHERE 1=1
