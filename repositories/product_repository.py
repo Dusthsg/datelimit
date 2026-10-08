@@ -11,6 +11,7 @@ class ProductRepository:
    
    def search_by_name(self, name: str) -> int:
       self.cursor.execute("SELECT id FROM products WHERE name LIKE ?", (name,))
+      return self.cursor.fetchone()
 
    def delete(self, product_id) -> None:
       self.cursor.execute("DELETE FROM products WHERE id = ?", (product_id,))

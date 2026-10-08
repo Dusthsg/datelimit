@@ -12,7 +12,7 @@ def orquest(colunas: list, dados: list) -> None:
     if not dados:
         print("\nNenhum registro encontrado para exportar.")
         return
-    show_data(dados)
+    show_data(colunas, dados)
 
     while True:
       opcao = input("\nDeseja exportar esses dados para Excel? (s/n): ").strip().lower()
@@ -25,7 +25,7 @@ def orquest(colunas: list, dados: list) -> None:
         if not nome.endswith(".xlsx"):
             nome += ".xlsx"
             
-        make_ex(colunas, dados, nome)
+        make_ex(colunas, dados)
       else:
         print("Finalizado sem exportação.")
         return
@@ -34,8 +34,8 @@ def orquest(colunas: list, dados: list) -> None:
 def query_venc():
     q_date = " AND l.date_valid < ?"
     today = date.today().strftime("%Y-%m-%d")
-    colunas = lot_repo.get_columns()
     dados = lot_repo.read(q_date, [today])
+    colunas = lot_repo.get_columns()
     orquest(colunas, dados)
 
 
@@ -45,8 +45,8 @@ def query_days(days_min, days_max):
     end = (today + timedelta(days=days_max)).strftime("%Y-%m-%d")
 
     query_search = " AND l.date_valid BETWEEN ? AND ?"
-    colunas = lot_repo.get_columns()
     dados = lot_repo.read(query_search, [init, end])
+    colunas = lot_repo.get_columns()
     orquest(colunas, dados)
 
 
@@ -124,8 +124,8 @@ def adv_query(req_list):
         else:
             print("Entrada de quantidade inválida! Digite 1 ou 2 números.")
             return None
-    colunas = lot_repo.get_columns()
     dados = lot_repo.read(query, params)
+    colunas = lot_repo.get_columns()
     return colunas, dados
 
 """===================================================================================================================="""
@@ -170,7 +170,7 @@ def processing_update(args, entity):
     if 1 in args:
         new_name = input(f"Digite um novo nome para [{nome}]: ").strip()
         if new_name:
-            prod_repo.update(prod_id, {"name": new_name})
+            prod_repo.update_name(prod_id, {"name": new_name})
             print("-> Nome atualizado com sucesso!")
 
     # 2. Dicionário de campos dinâmicos para a tabela 'product_lots'
@@ -203,14 +203,14 @@ def processing_update(args, entity):
             new_local = input("Digite a novo local para o produto: ").strip().upper()
             lot_fields["location"] = new_local
         except ValueError:
-            print("Data inválida! Campo ignorado.")
+            print("Local Inválido! Campo ignorado.")
 
     if 6 in args:
         try:
             new_status = input("Digite o novo status exemplo (vencido): ").strip().upper()
             lot_fields["status"] = new_status
         except ValueError:
-            print("Data inválida! Campo ignorado.")
+            print("Status inválido! Campo ignorado.")
 
     # 3. Executa o update dinâmico via repositório
     if lot_fields:

@@ -21,7 +21,7 @@ def advanced_menu():
                 print("Nenhuma opção informada")
 
             if (0 in args and len(args) == 1):
-                return None
+                return
             
             if 0 in args:
                 print("Entrada Inválida! [0] é valor de sáida")
