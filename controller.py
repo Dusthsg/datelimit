@@ -12,7 +12,7 @@ def orquest(colunas: list, dados: list) -> None:
     if not dados:
         print("\nNenhum registro encontrado para exportar.")
         return
-    show_data(dados)
+    show_data(colunas, dados)
 
     # opção digitada -> (função de exportação, nome padrão, extensão)
     formatos = {
