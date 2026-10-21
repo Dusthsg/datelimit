@@ -185,7 +185,7 @@ def processing_update(args, entity):
     if 1 in args:
         new_name = input(f"Digite um novo nome para [{nome}]: ").strip()
         if new_name:
-            prod_repo.update_name(prod_id, {"name": new_name})
+            prod_repo.update_name(new_name, prod_id)
             print("-> Nome atualizado com sucesso!")
 
     # 2. Dicionário de campos dinâmicos para a tabela 'product_lots'
