@@ -80,8 +80,8 @@ def call_menu():
         elif num == 5:
             query_days(0, 45)
         elif num == 6:
-            colunas = repo.get_columns()
             dados = repo.read()
+            colunas = repo.get_columns()
             orquest(colunas, dados)
         elif num == 7:
             column, data = advanced_menu()
