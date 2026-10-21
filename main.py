@@ -41,7 +41,7 @@ def main():
               print("Operação cancelada")
                 
         elif opcao == 3:
-             _, data = advanced_menu()
+             _, data = advanced_menu() or (None, None)
              if data:  
                 entity = selector(data)
                 if entity: 
@@ -50,7 +50,7 @@ def main():
                 else:
                   print("\nNenhum registro encontrado para Atualização.")
         elif opcao == 4:
-          _, data = advanced_menu()
+          _, data = advanced_menu() or (None, None)
           if data:  
              entity = selector(data)
              if entity:  
