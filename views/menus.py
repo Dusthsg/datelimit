@@ -84,8 +84,10 @@ def call_menu():
             colunas = repo.get_columns()
             orquest(colunas, dados)
         elif num == 7:
-            column, data = advanced_menu()
-            orquest(column, data)
+            result = advanced_menu()
+            if result:
+                column, data = result
+                orquest(column, data)
         elif num == 0:
             print("Saindo...")
             break
