@@ -1,5 +1,5 @@
 from datetime import datetime, date, timedelta
-from archive_mp.export import make_ex 
+from archive_mp.export import make_xlsx, make_csv
 from repositories.lot_repository import LotRepository
 from repositories.product_repository import ProductRepository
 from views.screens import show_data
@@ -12,24 +12,38 @@ def orquest(colunas: list, dados: list) -> None:
     if not dados:
         print("\nNenhum registro encontrado para exportar.")
         return
-    show_data(colunas, dados)
+    show_data(dados)
+
+    # opção digitada -> (função de exportação, nome padrão, extensão)
+    formatos = {
+        "x": (make_xlsx, "lotes.xlsx", ".xlsx"),
+        "c": (make_csv, "lotes.csv", ".csv"),
+    }
 
     while True:
-      opcao = input("\nDeseja exportar esses dados para Excel? (s/n): ").strip().lower()
+        opcao = input("\nExportar os dados? [x] Excel  [c] CSV  [n] Não: ").strip().lower()
 
-      if opcao not in ["s", "n"]:
-          break
-    
-      if opcao == "s":
-        nome = input("Nome do arquivo (Enter para 'lotes.xlsx'): ").strip() or "lotes.xlsx"
-        if not nome.endswith(".xlsx"):
-            nome += ".xlsx"
-            
-        make_ex(colunas, dados)
-      else:
-        print("Finalizado sem exportação.")
+        if opcao == "n":
+            print("Finalizado sem exportação.")
+            return
+
+        if opcao not in formatos:
+            print("Opção inválida! Digite x, c ou n.")
+            continue
+
+        funcao, nome_padrao, extensao = formatos[opcao]
+        nome = input(f"Nome do arquivo (Enter para '{nome_padrao}'): ").strip() or nome_padrao
+        if not nome.endswith(extensao):
+            nome += extensao
+
+        try:
+            funcao(colunas, dados, nome)
+        except OSError as erro:
+            # arquivo aberto em outro programa, pasta inexistente, sem permissão etc.
+            print(f"\n[ERRO] Não foi possível salvar '{nome}': {erro}")
+            continue
         return
-       
+
 
 def query_venc():
     q_date = " AND l.date_valid < ?"
@@ -58,9 +72,9 @@ def adv_query(req_list):
         text = input("Insira o nome ou parte dele para buscar: ").strip()
 
         if not text:
-             print("ERRO 301, entrada não inserida")
-             return None
-        
+            print("ERRO 301, entrada não inserida")
+            return None
+
         query += " AND p.name LIKE ?"
         params.append(f"%{text}%")
 
@@ -69,7 +83,7 @@ def adv_query(req_list):
         if not input_date:
             print("ERRO 301, entrada não inserida")
             return None
-        
+
         try:
             datef = datetime.strptime(input_date.replace("/", "-"), "%d-%m-%Y").strftime("%Y-%m-%d")
             query += " AND l.date_valid = ?"
@@ -83,8 +97,8 @@ def adv_query(req_list):
         arr = [int(x.strip()) for x in datei.split(",") if x.strip().isdigit()]
         today = datetime.now().date()
         if not datei:
-                    print("ERRO 301, entrada não inserida")
-                    return None
+            print("ERRO 301, entrada não inserida")
+            return None
 
         if len(arr) == 2:
             days_min, days_max = sorted(arr)
@@ -110,8 +124,8 @@ def adv_query(req_list):
         entrada_qtd = input("Insira a quantidade (ex: 10 para teto, ou 0, 10 para intervalo): ").strip()
         arr_qtd = [int(x.strip()) for x in entrada_qtd.split(",") if x.strip().isdigit()]
         if not entrada_qtd:
-                    print("ERRO 301, entrada não inserida")
-                    return None
+            print("ERRO 301, entrada não inserida")
+            return None
 
         if len(arr_qtd) == 1:
             query += " AND l.quant <= ?"
@@ -128,6 +142,7 @@ def adv_query(req_list):
     colunas = lot_repo.get_columns()
     return colunas, dados
 
+
 """===================================================================================================================="""
 """Selector"""
 """===================================================================================================================="""
@@ -136,21 +151,21 @@ def selector(data: list):
     if not data:
         print("\nNenhum registro para selecionar.")
         return None
-    
+
     for i, row in enumerate(data, start=1):
-         lot_id, nome, prod_id, quant, price, validade = row[:6]
-         print(f"[{i:<5}] Lote #{lot_id:<6} | {nome:<50} | Qtd: {quant:<5} | Preço: R$ {price:<7} | {validade:<10} ")
+        lot_id, nome, prod_id, quant, price, validade = row[:6]
+        print(f"[{i:<5}] Lote #{lot_id:<6} | {nome:<50} | Qtd: {quant:<5} | Preço: R$ {price:<7} | {validade:<10} ")
     print("[0] Cancelar operação")
     print("=" * 60)
 
     while True:
         try:
             escolha = int(input("\nEscolha o número do item desejado: "))
-            
+
             if escolha == 0:
                 print("Operação cancelada.")
                 return None
-            
+
             # Verifica se o número digitado existe na lista (entre 1 e o total de linhas)
             if 1 <= escolha <= len(data):
                 # O índice real da lista em Python começa em 0, então subtrai 1:
@@ -158,7 +173,7 @@ def selector(data: list):
                 return item_selecionado
             else:
                 print(f"Número fora do intervalo! Digite um valor entre 1 e {len(data)}.")
-                
+
         except ValueError:
             print("Entrada inválida! Digite apenas números inteiros.")
 
