@@ -1,7 +1,6 @@
 from datetime import datetime
 
-def show_data(columns, data):
-    
+def show_data(data):
     print("\n" + "=" * 105)
     print(f"{'Lote':<6} | {'Produto':<50} | {'Prod ID':<8} | {'Qtd':<6} | {'Preço':<8} | {'Validade':<10}")
     print("-" * 100)

@@ -1,10 +1,11 @@
-from database import conn, cursor, init_db
-from controller import selector, processing_update
+from database.database import conn, cursor, init_db
+from controllers.selectors import selector
+from controllers.processing import processing_update
 
 from views.menus import call_menu, advanced_menu
 from views.screens import add_product, update_product
 from repositories.lot_repository import LotRepository
-from models import NewLotItem
+from database.models import NewLotItem
 repo = LotRepository()
 
 

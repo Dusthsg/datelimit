@@ -6,7 +6,7 @@ RAIZ_PROJETO = DIR_ATUAL.parent
 sys.path.append(str(RAIZ_PROJETO))
 
 import pandas as pd
-from database import conn, cursor
+from database.database import conn, cursor
 
 EXCEL_PATH = DIR_ATUAL / "lista.xlsx"
 
@@ -22,7 +22,7 @@ for _, row in df_filt.iterrows():
     p_valid = row["date_valid"]
 
     # Passo A: Insere o produto na tabela 'products' se não existir
-    cursor.execute("INSERT OR IGNORE INTO products (name) VALUES (?);", (p_name,))
+    cursor.execute("INSERT OR IGNORE INTO products (name, price) VALUES (?, ?);", (p_name, 0.0))
     
     # Passo B: Recupera o ID do produto
     cursor.execute("SELECT id FROM products WHERE name = ?;", (p_name,))
@@ -37,8 +37,8 @@ for _, row in df_filt.iterrows():
 
     if not existe_lote:
         cursor.execute(
-            "INSERT INTO product_lots (product_id, quant, price, date_valid) VALUES (?, ?, ?, ?);",
-            (product_id, 0, 0.0, p_valid)
+            "INSERT INTO product_lots (product_id, quant, date_valid) VALUES (?, ?, ?);",
+            (product_id, 0, p_valid)
         )
 
 conn.commit()

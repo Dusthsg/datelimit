@@ -1,4 +1,5 @@
-from controller import adv_query, query_venc, query_days, orquest
+from controllers.querys import adv_query, query_venc, query_days
+from controllers.orquest import orquest
 from repositories.lot_repository import LotRepository
 repo = LotRepository()
 

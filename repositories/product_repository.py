@@ -1,4 +1,4 @@
-from database import conn as default_conn
+from database.database import conn as default_conn
 
 class ProductRepository:
    def __init__(self, connection=None):

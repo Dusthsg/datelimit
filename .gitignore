@@ -45,6 +45,7 @@ Thumbs.db
 *.db
 *.sqlite
 *.sqlite3
+!database/products.db
 
 # Logs
 *.log

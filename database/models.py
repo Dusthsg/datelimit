@@ -1,4 +1,4 @@
-from database import conn, cursor
+from database.database import conn, cursor
 from repositories.product_repository import ProductRepository
 from repositories.lot_repository import LotRepository
 

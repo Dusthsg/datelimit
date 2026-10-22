@@ -1,4 +1,4 @@
-from database import conn as default_conn
+from database.database import conn as default_conn
 from datetime import datetime
 
 class LotRepository:
@@ -53,7 +53,7 @@ class LotRepository:
         p.name AS product_name,
         p.id AS product_id,
         l.quant,
-        l.price,
+        p.price,
         l.date_valid,
         l.location,
         l.status
