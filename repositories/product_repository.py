@@ -17,12 +17,26 @@ class ProductRepository:
       self.cursor.execute("DELETE FROM products WHERE id = ?", (product_id,))
       self.conn.commit()
 
-   def update_name(self, new_name: str, prod_id: int) -> None:
-      self.cursor.execute("UPDATE products SET name = ? WHERE id = ?", (new_name, prod_id))
-      self.conn.commit()
+   def update(self, prod_id, fields: dict) -> bool:
+      if not fields:
+         return False
 
-   def create(self, name: str) -> int:
-      self.cursor.execute("INSERT INTO products (name) VALUES (?)", (name,))
+      if isinstance(prod_id, (tuple, list)):
+         prod_id = prod_id[0]
+
+      set_clauses = ", ".join([f"{col} = ?" for col in fields.keys()])
+      sql = f"UPDATE products SET {set_clauses} WHERE id = ?"
+
+      params = list(fields.values()) + [prod_id]
+
+      self.cursor.execute(sql, tuple(params))
+      self.conn.commit()
+      
+      return self.cursor.rowcount > 0
+
+
+   def create(self, name: str, price: float) -> int:
+      self.cursor.execute("INSERT INTO products (name, price) VALUES (?, ?)", (name, price))
       self.conn.commit()
 
       return self.cursor.lastrowid

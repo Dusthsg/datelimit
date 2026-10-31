@@ -6,11 +6,11 @@ class LotRepository:
        self.conn = connection or default_conn
        self.cursor = self.conn.cursor()
 
-    def create(self, product_id: int, quant: int, price: float, date_valid: str):
+    def create(self, product_id: int, quant: int, date_valid: str):
         self.cursor.execute("""
-                    INSERT INTO product_lots (product_id, quant, price, date_valid) 
-                    VALUES (?, ?, ?, ?)
-                """, (product_id, quant, price, date_valid))
+                    INSERT INTO product_lots (product_id, quant, date_valid) 
+                    VALUES (?, ?, ?)
+                """, (product_id, quant, date_valid))
         self.conn.commit()
         lot_id = self.cursor.lastrowid
         return lot_id

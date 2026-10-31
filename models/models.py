@@ -23,12 +23,11 @@ class NewLotItem:
         if row:
             product_id = row[0]
         else:
-            product_id = product_repo.create(self.name)
+            product_id = product_repo.create(self.name, price=self.price)
 
         lot_id = lot_repo.create(
             product_id=product_id,
             quant=self.quant,
-            price=self.price,
             date_valid=self.date_valid
         )
 

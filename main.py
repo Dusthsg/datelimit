@@ -5,7 +5,7 @@ from controllers.processing import processing_update
 from views.menus import call_menu, advanced_menu
 from views.screens import add_product, update_product
 from repositories.lot_repository import LotRepository
-from database.models import NewLotItem
+from models.models import NewLotItem
 repo = LotRepository()
 
 

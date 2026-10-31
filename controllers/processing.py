@@ -9,12 +9,27 @@ lot_repo = LotRepository()
 def processing_update(args, entity):
     lot_id, nome, prod_id, quant, price, validade = entity[:6]
 
+    prod_fields = {}
+
     # 1. Se escolheu alterar o Nome (Tabela 'products')
     if 1 in args:
         new_name = input(f"Digite um novo nome para [{nome}]: ").strip()
         if new_name:
-            prod_repo.update_name(new_name, prod_id)
-            print("-> Nome atualizado com sucesso!")
+            prod_fields["name"] = new_name
+
+    if 3 in args:
+        try:
+          raw_price = input(f"Digite um novo preço para [{price:.2f}]: ").replace(",", ".")
+          prod_fields["price"] = float(raw_price)
+        except ValueError:
+            
+            print("Preço inválido! Campo ignorado.")
+    if prod_fields:
+      sucesso = prod_repo.update(prod_id, prod_fields)
+      if sucesso:
+            print(f"\n[OK] Produto #{prod_id} atualizado com sucesso!")
+      else:
+            print("\n[!] Falha ao atualizar o lote.")
 
     # 2. Dicionário de campos dinâmicos para a tabela 'product_lots'
     lot_fields = {}
@@ -25,13 +40,6 @@ def processing_update(args, entity):
             lot_fields["quant"] = new_quant
         except ValueError:
             print("Quantidade inválida! Campo ignorado.")
-
-    if 3 in args:
-        try:
-            raw_price = input(f"Digite um novo preço para [{price:.2f}]: ").replace(",", ".")
-            lot_fields["price"] = float(raw_price)
-        except ValueError:
-            print("Preço inválido! Campo ignorado.")
 
     if 4 in args:
         try:
