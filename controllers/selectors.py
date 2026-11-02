@@ -4,8 +4,7 @@ def selector(data: list):
         return None
 
     for i, row in enumerate(data, start=1):
-        lot_id, nome, prod_id, quant, price, validade = row[:6]
-        print(f"[{i:<5}] Lote #{lot_id:<6} | {nome:<50} | Qtd: {quant:<5} | Preço: R$ {price:<7} | {validade:<10} ")
+        print(f"\n[{i:<4}] Lote #{row.lot_id} | {row.product_name:<30} | Qtd: {row.quant:<5} | Preço: R$ {row.price:<7.2f} | Validade: {row.date_valid}")
     print("[0] Cancelar operação")
     print("=" * 60)
 

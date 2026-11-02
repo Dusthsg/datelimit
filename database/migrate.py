@@ -39,6 +39,18 @@ def migrate():
         updated_count = cursor.rowcount
         print(f"-> Preços sincronizados com sucesso! ({updated_count} produtos atualizados)")
 
+        # 3. Adiciona a coluna origin em product_lots
+        cursor.execute("PRAGMA table_info(product_lots);")
+        l_cols = [c[1] for c in cursor.fetchall()]
+        if "origin" not in l_cols:
+            cursor.execute("ALTER TABLE product_lots ADD COLUMN origin TEXT DEFAULT 'MANUAL';")
+            print("-> Coluna 'origin' adicionada à tabela 'product_lots'.")
+        else:
+            print("-> Coluna 'origin' já existia na tabela 'product_lots'.")
+
+        cursor.execute("UPDATE product_lots SET origin = 'IMPORTACAO' WHERE location = 'GALPAO';")
+        cursor.execute("UPDATE product_lots SET origin = 'MANUAL' WHERE origin IS NULL;")
+
         conn.commit()
         print("\nMigração concluída com êxito!")
 

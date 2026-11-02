@@ -24,7 +24,11 @@ class LotEntity:
    product_name: str
    product_id: int
    quant: int
-   price: int
+   price: float
    date_valid: str
    location: str = "LOJA"
    status: str = "NORMAL"
+
+   def __str__(self) -> str:
+     """Define como a entidade se transforma em texto para a tabela."""
+     return f"{self.lot_id:<6} | {self.product_name:<50} | {self.product_id:<8} | {self.quant:<6} | R${self.price:<6.2f} | {self.date_valid:<10}"

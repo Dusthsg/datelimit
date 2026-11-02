@@ -1,3 +1,4 @@
+from dataclasses import asdict, is_dataclass
 import pandas as pd
 
 
@@ -16,7 +17,10 @@ NOMES_COLUNAS = {
 
 def _make_dataframe(colunas: list, dados: list) -> pd.DataFrame:
     """Monta o DataFrame e troca apenas os cabeçalhos da exportação."""
-    df = pd.DataFrame(dados, columns=colunas)
+    if dados and is_dataclass(dados[0]):
+      df = pd.DataFrame([asdict(item) for item in dados])
+    else:
+      df = pd.DataFrame(dados, columns=colunas)
     return df.rename(columns=NOMES_COLUNAS)
 
 

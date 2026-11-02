@@ -4,14 +4,13 @@ def show_data(data):
     print("\n" + "=" * 105)
     print(f"{'Lote':<6} | {'Produto':<50} | {'Prod ID':<8} | {'Qtd':<6} | {'Preço':<8} | {'Validade':<10}")
     print("-" * 100)
-    for lin in data:
-            lot_id, nome, prod_id, quant, price, validade = lin[:6]
-            print(f"{lot_id:<6} | {nome:<50} | {prod_id:<8} | {quant:<6} | R${price:<6.2f} | {validade:<10}")
+    for item in data:
+          print(item)
     print("=" * 105)
 
 def delete(entity):
-     lot_id, nome, prod_id, quant, price, validade = entity[:6]
-     print(f"\nEntidade Selecionada: Lote #{lot_id} | {nome:<30} | Qtd: {quant:<5} | Preço: R$ {price:<7} | Validade: {validade}")
+     
+     print(f"\nEntidade Selecionada: Lote #{entity.lot_id} | {entity.product_name:<30} | Qtd: {entity.quant:<5} | Preço: R$ {entity.price:<7.2f} | Validade: {entity.date_valid}")
      print("[1] Deletar apenas este lote")
      print("[2] Deletar o produto e todos os seus lotes")
      print("[0] Cancelar")
@@ -20,12 +19,12 @@ def delete(entity):
 
      if num == "1":
          aviso = "Tem certeza que deseja deletar o item selecionado s/n: ".lower().strip()
-         alvo = (f"lote: ", lot_id)
+         alvo = (f"lote: ", entity.lot_id)
          
      elif num == "2":
-         print(f"\nATENÇÃO! isso deletará o '{nome}' e todos os seus lotes correpondentes do banco de dados")
+         print(f"\nATENÇÃO! isso deletará o '{entity.product_name}' e todos os seus lotes correpondentes do banco de dados")
          aviso = "confirma a exclusão completa do produto? (s/n):".lower().strip()
-         alvo = (f"produto: ", prod_id)
+         alvo = (f"produto: ", entity.product_id)
      elif num == "0":
         print("Operação cancelada.")
         return None, None
@@ -92,8 +91,7 @@ def add_product():
     }
 
 def update_product(entity):
-    lot_id, nome, prod_id, quant, price, validade = entity[:6]
-    print(f"\nEntidade Selecionada: Lote #{lot_id:<7} | {nome:<50} | Qtd: {quant:<4} | Preço: R$ {price:<7} | Val: {validade}")
+    print(f"\nEntidade Selecionada: Lote #{entity.lot_id} | {entity.product_name:<30} | Qtd: {entity.quant:<5} | Preço: R$ {entity.price:<7.2f} | Validade: {entity.date_valid}")
 
     print("\n" + "=" * 55)
     print(f"{'Selecione o que deseja editar':^50}")

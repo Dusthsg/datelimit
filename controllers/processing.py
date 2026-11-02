@@ -7,27 +7,25 @@ lot_repo = LotRepository()
 
 
 def processing_update(args, entity):
-    lot_id, nome, prod_id, quant, price, validade = entity[:6]
-
     prod_fields = {}
 
     # 1. Se escolheu alterar o Nome (Tabela 'products')
     if 1 in args:
-        new_name = input(f"Digite um novo nome para [{nome}]: ").strip()
+        new_name = input(f"Digite um novo nome para [{entity.product_name}]: ").strip()
         if new_name:
             prod_fields["name"] = new_name
 
     if 3 in args:
         try:
-          raw_price = input(f"Digite um novo preço para [{price:.2f}]: ").replace(",", ".")
+          raw_price = input(f"Digite um novo preço para [{entity.price:.2f}]: ").replace(",", ".")
           prod_fields["price"] = float(raw_price)
         except ValueError:
             
             print("Preço inválido! Campo ignorado.")
     if prod_fields:
-      sucesso = prod_repo.update(prod_id, prod_fields)
+      sucesso = prod_repo.update(entity.product_id, prod_fields)
       if sucesso:
-            print(f"\n[OK] Produto #{prod_id} atualizado com sucesso!")
+            print(f"\n[OK] Produto #{entity.product_id} atualizado com sucesso!")
       else:
             print("\n[!] Falha ao atualizar o lote.")
 
@@ -36,7 +34,7 @@ def processing_update(args, entity):
 
     if 2 in args:
         try:
-            new_quant = int(input(f"Digite uma nova quantidade para [{quant}]: "))
+            new_quant = int(input(f"Digite uma nova quantidade para [{entity.quant}]: "))
             lot_fields["quant"] = new_quant
         except ValueError:
             print("Quantidade inválida! Campo ignorado.")
@@ -65,8 +63,8 @@ def processing_update(args, entity):
 
     # 3. Executa o update dinâmico via repositório
     if lot_fields:
-        sucesso = lot_repo.update(lot_id, lot_fields)
+        sucesso = lot_repo.update(entity.lot_id, lot_fields)
         if sucesso:
-            print(f"\n[OK] Lote #{lot_id} atualizado com sucesso!")
+            print(f"\n[OK] Lote #{entity.lot_id} atualizado com sucesso!")
         else:
             print("\n[!] Falha ao atualizar o lote.")

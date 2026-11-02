@@ -1,5 +1,5 @@
 from database.database import conn as default_conn
-from datetime import datetime
+from models.domain import LotEntity
 
 class LotRepository:
     def __init__(self, connection=None):
@@ -63,7 +63,8 @@ class LotRepository:
     """
         query_final = query_base + query_search + " ORDER BY l.date_valid ASC, p.name ASC;"
         self.cursor.execute(query_final, params)
-        return self.cursor.fetchall()
+        rows = self.cursor.fetchall()
+        return [LotEntity(*row) for row in rows]
 
     def get_columns(self):
         """Retorna os nomes das colunas da última consulta executada."""
